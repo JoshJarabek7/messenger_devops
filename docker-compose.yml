@@ -25,9 +25,15 @@ services:
       - ./.env.BACKEND
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     depends_on:
       db:
         condition: service_healthy
+
   frontend:
     build:
       context: ../frontend
@@ -36,9 +42,15 @@ services:
       - "3000:3000"
     env_file:
       - ./.env.FRONTEND
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     depends_on:
       backend:
         condition: service_healthy
+
   nginx:
     image: nginx:alpine
     ports:
