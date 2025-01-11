@@ -21,9 +21,10 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -subj "/CN=${DOMAIN}" \
     -addext "subjectAltName=DNS:${DOMAIN}"
 
-# Set proper permissions
-sudo chown -R $USER:$USER /etc/nginx/ssl
-chmod -R 600 /etc/nginx/ssl
+# Set proper permissions (readable by nginx container)
+sudo chown -R 101:101 /etc/nginx/ssl  # 101 is nginx user in the container
+sudo chmod -R 644 /etc/nginx/ssl/*.pem
+sudo chmod 755 /etc/nginx/ssl
 
 echo "Self-signed SSL certificate generated successfully!"
 echo "Note: Browsers will show a security warning because this is a self-signed certificate."
