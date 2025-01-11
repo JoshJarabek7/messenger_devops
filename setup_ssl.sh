@@ -5,6 +5,11 @@ set -e
 
 DOMAIN="ec2-3-144-41-168.us-east-2.compute.amazonaws.com"
 
+# Stop and disable system nginx if it exists
+echo "Stopping system NGINX..."
+sudo systemctl stop nginx || true
+sudo systemctl disable nginx || true
+
 # Create directory for certificates if it doesn't exist
 sudo mkdir -p /etc/nginx/ssl
 
