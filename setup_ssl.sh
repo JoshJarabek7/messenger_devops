@@ -7,13 +7,13 @@ DOMAIN="ec2-3-144-41-168.us-east-2.compute.amazonaws.com"
 
 # Stop and disable system nginx if it exists
 echo "Stopping system NGINX..."
-sudo systemctl stop nginx || true
-sudo systemctl disable nginx || true
+systemctl stop nginx || true
+systemctl disable nginx || true
 
 # Create a temporary directory for certificates
 echo "Creating temporary directory..."
 TEMP_SSL_DIR=$(mktemp -d)
-chmod 755 $TEMP_SSL_DIR
+chmod 777 $TEMP_SSL_DIR
 
 # Generate self-signed certificate
 echo "Generating self-signed certificate..."
@@ -22,6 +22,9 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -out $TEMP_SSL_DIR/fullchain.pem \
     -subj "/CN=${DOMAIN}" \
     -addext "subjectAltName=DNS:${DOMAIN}"
+
+# List files to verify they exist
+ls -la $TEMP_SSL_DIR
 
 # Ensure certificates are readable
 chmod 644 $TEMP_SSL_DIR/*.pem
@@ -36,7 +39,7 @@ docker run --rm \
     -v ssl_certs:/ssl \
     -v $TEMP_SSL_DIR:/certs:ro \
     alpine \
-    sh -c "cp /certs/*.pem /ssl/ && chown -R 101:101 /ssl && chmod -R 600 /ssl/*.pem"
+    sh -c "ls -la /certs && cp /certs/*.pem /ssl/ && chown -R 101:101 /ssl && chmod -R 600 /ssl/*.pem"
 
 # Clean up temporary directory
 echo "Cleaning up..."
