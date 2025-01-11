@@ -59,7 +59,10 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - nginx_temp:/var/cache/nginx
-      - /etc/nginx/ssl:/etc/nginx/ssl:ro
+      - type: bind
+        source: /etc/nginx/ssl
+        target: /etc/nginx/ssl
+        read_only: true
     tmpfs:
       - /var/run
     depends_on:
