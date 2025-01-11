@@ -55,9 +55,11 @@ services:
     image: nginx:alpine
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - nginx_temp:/var/cache/nginx
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
     tmpfs:
       - /var/run
     depends_on:
