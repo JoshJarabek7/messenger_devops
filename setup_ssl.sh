@@ -10,21 +10,30 @@ echo "Stopping system NGINX..."
 sudo systemctl stop nginx || true
 sudo systemctl disable nginx || true
 
-# Create directory for certificates if it doesn't exist
-sudo mkdir -p /etc/nginx/ssl
+# Create a temporary directory for certificates
+echo "Creating temporary directory..."
+TEMP_SSL_DIR=$(mktemp -d)
 
 # Generate self-signed certificate
 echo "Generating self-signed certificate..."
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/privkey.pem \
-    -out /etc/nginx/ssl/fullchain.pem \
+    -keyout $TEMP_SSL_DIR/privkey.pem \
+    -out $TEMP_SSL_DIR/fullchain.pem \
     -subj "/CN=${DOMAIN}" \
     -addext "subjectAltName=DNS:${DOMAIN}"
 
-# Set proper permissions (readable by nginx container)
-sudo chown -R 101:101 /etc/nginx/ssl  # 101 is nginx user in the container
-sudo chmod -R 644 /etc/nginx/ssl/*.pem
-sudo chmod 755 /etc/nginx/ssl
+# Create Docker volume if it doesn't exist
+echo "Creating Docker volume..."
+sudo docker volume create ssl_certs
+
+# Copy certificates to Docker volume using a temporary container
+echo "Copying certificates to Docker volume..."
+sudo docker run --rm -v ssl_certs:/ssl -v $TEMP_SSL_DIR:/certs:ro alpine \
+    sh -c "cp /certs/* /ssl/ && chown -R 101:101 /ssl && chmod -R 600 /ssl/*"
+
+# Clean up temporary directory
+echo "Cleaning up..."
+sudo rm -rf $TEMP_SSL_DIR
 
 echo "Self-signed SSL certificate generated successfully!"
 echo "Note: Browsers will show a security warning because this is a self-signed certificate."
