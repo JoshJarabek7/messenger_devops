@@ -1,3 +1,4 @@
 .env.BACKEND
 .env.DB
-.env.FRONTEND
+.env*
+!.env.*.example

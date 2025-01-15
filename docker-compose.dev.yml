@@ -49,7 +49,7 @@ services:
       - "5173:5173"
       - "24678:24678"
     env_file:
-      - .env.FRONTEND
+      - .env.FRONTEND.dev
     depends_on:
       backend:
         condition: service_healthy
