@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "${PGADMIN_SERVER_NAME}",
+            "Group": "Servers",
+            "Host": "${PGADMIN_SERVER_DB_HOST}",
+            "Port": 5432,
+            "MaintenanceDB": "${PGADMIN_SERVER_MAINTENANCE_DB}",
+            "Username": "${PGADMIN_SERVER_DB_USERNAME}",
+            "Password": "${PGADMIN_SERVER_DB_PASSWORD}",
+            "SSLMode": "prefer"
+        }
+    }
+}
